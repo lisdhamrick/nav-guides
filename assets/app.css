@@ -20,7 +20,7 @@
 body {
   margin: 0;
   font-family: var(--font);
-  background: radial-gradient(circle at top, #1e293b 0%, #0f172a 45%, #020617 100%);
+  background: radial-gradient(circle at top, #3b3b3b 0%, #292929 45%, #000000 100%);
   color: var(--text);
   min-height: 100vh;
 }
