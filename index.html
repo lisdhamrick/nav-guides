@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Step Guide - Static Guide Builder</title>
+    <link rel="stylesheet" href="assets/app.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Standalone, no-logins viewer</p>
+          <h1>Step Guide</h1>
+          <p class="lede">
+            Build step-by-step visual guides and share them with public links or embeds.
+            No accounts required for viewers.
+          </p>
+          <div class="actions">
+            <a class="btn primary" href="editor.html">Create a guide</a>
+            <a class="btn" href="viewer.html">View a guide</a>
+          </div>
+        </div>
+        <div class="card">
+          <h2>How it works</h2>
+          <ol>
+            <li>Build your guide in the editor.</li>
+            <li>Export JSON (self-contained with images).</li>
+            <li>Publish JSON on GitHub Pages.</li>
+            <li>Share or embed the viewer URL.</li>
+          </ol>
+        </div>
+      </header>
+
+      <section class="grid">
+        <div class="panel">
+          <h3>Embed friendly</h3>
+          <p>
+            The viewer works in an iframe. It can load a guide from a JSON file in
+            your GitHub Pages repo.
+          </p>
+          <code class="code">viewer.html?src=guides/sample.json</code>
+        </div>
+        <div class="panel">
+          <h3>PDF export</h3>
+          <p>
+            The viewer supports print styles. Use the "Print / Save PDF" button
+            to export.
+          </p>
+        </div>
+        <div class="panel">
+          <h3>Optional media</h3>
+          <p>
+            Add video links or audio voiceover per step.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

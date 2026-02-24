@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Guide Editor</title>
+    <link rel="stylesheet" href="assets/app.css" />
+  </head>
+  <body>
+    <main class="editor-shell">
+      <div class="viewer-header">
+        <div>
+          <p class="eyebrow">Guide Builder</p>
+          <h1>Create a step-by-step guide</h1>
+        </div>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <button class="btn" id="loadJson">Load JSON</button>
+          <button class="btn" id="exportJson">Export JSON</button>
+          <button class="btn primary" id="exportHtml">Export HTML</button>
+        </div>
+      </div>
+
+      <section class="editor-layout">
+        <aside class="panel-list">
+          <h2>Steps</h2>
+          <div id="stepList"></div>
+          <div class="step-actions">
+            <button class="btn primary" id="addStep">Add step</button>
+            <button class="btn" id="removeStep">Remove step</button>
+          </div>
+        </aside>
+
+        <section class="form">
+          <label>
+            Guide title
+            <input id="guideTitle" placeholder="Guide title" />
+          </label>
+          <label>
+            Guide description
+            <textarea id="guideDescription" placeholder="Who is this for and what will they learn?"></textarea>
+          </label>
+
+          <hr />
+
+          <label>
+            Step title
+            <input id="stepTitle" placeholder="Step title" />
+          </label>
+          <label>
+            Step instructions
+            <textarea id="stepText" placeholder="Explain what to do in this step."></textarea>
+          </label>
+          <label>
+            Image (screenshot or graphic)
+            <input type="file" id="stepImage" accept="image/*" />
+          </label>
+          <label>
+            Video URL (YouTube, Vimeo, Google Drive share link)
+            <input id="stepVideo" placeholder="https://" />
+          </label>
+          <label>
+            Voiceover audio URL (mp3/wav)
+            <input id="stepAudio" placeholder="https://" />
+          </label>
+          <div class="step-actions">
+            <button class="btn" id="addMarker">Add marker</button>
+            <button class="btn" id="clearMarkers">Clear markers</button>
+          </div>
+
+          <div class="preview">
+            <strong>Preview</strong>
+            <div id="imageStage" class="image-stage"></div>
+            <p id="markerHint" class="lede" style="margin: 12px 0 0; font-size: 0.95rem;"></p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <input type="file" id="jsonFile" accept="application/json" hidden />
+    <script src="assets/editor.js"></script>
+  </body>
+</html>
