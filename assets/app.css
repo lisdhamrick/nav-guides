@@ -10,7 +10,7 @@
   --shadow: 0 10px 30px rgba(2, 6, 23, 0.45);
   --radius: 16px;
   --radius-sm: 10px;
-  --font: "Space Grotesk", "Trebuchet MS", system-ui, sans-serif;
+  --font: "Futura", "Space Grotesk", "Trebuchet MS", system-ui, sans-serif;
 }
 
 * {
