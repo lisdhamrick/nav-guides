@@ -177,7 +177,7 @@ const renderGuide = (guide, settings) => {
     <div class="library-actions">
       <a class="btn" href="editor.html?id=${guide.id}">Edit</a>
       <a class="btn" href="viewer.html?id=${guide.id}">Preview</a>
-      ${guide.publishedUrl ? `<a class="btn" href="${guide.publishedUrl}" target="_blank">Open live</a>` : }
+      ${guide.publishedUrl ? `<a class="btn" href="${guide.publishedUrl}" target="_blank">Open live</a>` : ""}
       <button class="btn" data-action="publish">Publish</button>
       <button class="btn" data-action="copy">Copy Link</button>
     </div>

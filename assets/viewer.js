@@ -7,6 +7,38 @@ const getQueryParam = (key) => {
 
 const storageKeys = { guidePrefix: "guide:" };
 
+const ensureLightbox = () => {
+  let box = document.querySelector(".lightbox");
+  if (box) return box;
+
+  box = document.createElement("div");
+  box.className = "lightbox hidden";
+  box.innerHTML = `
+    <button class="btn">Close</button>
+    <img alt="Zoomed view" />
+  `;
+  document.body.appendChild(box);
+
+  const close = () => box.classList.add("hidden");
+  box.onclick = (event) => {
+    if (event.target === box) close();
+  };
+  box.querySelector("button").onclick = close;
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") close();
+  });
+
+  return box;
+};
+
+const openLightbox = (src, alt) => {
+  const box = ensureLightbox();
+  const img = box.querySelector("img");
+  img.src = src;
+  img.alt = alt || "Zoomed view";
+  box.classList.remove("hidden");
+};
+
 const normalizeVideoUrl = (url) => {
   if (!url) return "";
   if (url.includes("youtube.com/watch") || url.includes("youtu.be")) {
@@ -60,6 +92,8 @@ const renderGuide = (guide) => {
       const img = document.createElement("img");
       img.src = step.imageDataUrl;
       img.alt = step.title || `Step ${index + 1}`;
+      img.style.cursor = "zoom-in";
+      img.onclick = () => openLightbox(step.imageDataUrl, img.alt);
       stage.appendChild(img);
 
       (step.markers || []).forEach((marker) => {
