@@ -32,6 +32,7 @@ const els = {
   stepAudio: document.getElementById("stepAudio"),
   imageStage: document.getElementById("imageStage"),
   markerHint: document.getElementById("markerHint"),
+  saveStatus: document.getElementById("saveStatus"),
   loadJson: document.getElementById("loadJson"),
   exportJson: document.getElementById("exportJson"),
   exportHtml: document.getElementById("exportHtml"),
@@ -41,7 +42,20 @@ const els = {
 };
 
 const saveLocal = () => {
-  localStorage.setItem("guideDraft", JSON.stringify(state.guide));
+  try {
+    localStorage.setItem("guideDraft", JSON.stringify(state.guide));
+    if (els.saveStatus) {
+      els.saveStatus.textContent = "";
+    }
+    return true;
+  } catch (err) {
+    console.warn("Autosave failed:", err);
+    if (els.saveStatus) {
+      els.saveStatus.textContent =
+        "Autosave is off (image too large for browser storage). Your preview is safe, but export soon.";
+    }
+    return false;
+  }
 };
 
 const loadLocal = () => {
@@ -103,17 +117,6 @@ const renderPreview = () => {
   const img = document.createElement("img");
   img.src = step.imageDataUrl;
   img.alt = step.title || "Step image";
-  img.onload = () => {
-    step.markers.forEach((marker) => {
-      const markerEl = document.createElement("div");
-      markerEl.className = "marker";
-      markerEl.textContent = marker.label;
-      markerEl.style.left = `${marker.x}%`;
-      markerEl.style.top = `${marker.y}%`;
-      els.imageStage.appendChild(markerEl);
-    });
-  };
-
   img.onclick = (event) => {
     if (!state.placingMarker) return;
     const rect = img.getBoundingClientRect();
@@ -151,17 +154,59 @@ const updateGuide = () => {
   renderStepList();
 };
 
-const handleImageUpload = (file) => {
+const loadImageElement = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = event.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+const canvasToDataUrl = (canvas, type, quality) => {
+  try {
+    return canvas.toDataURL(type, quality);
+  } catch (err) {
+    return canvas.toDataURL("image/jpeg", quality);
+  }
+};
+
+const compressImage = async (file) => {
+  const img = await loadImageElement(file);
+  const maxWidth = 1600;
+  const scale = Math.min(1, maxWidth / img.width);
+  const targetWidth = Math.max(1, Math.round(img.width * scale));
+  const targetHeight = Math.max(1, Math.round(img.height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+  const webp = canvasToDataUrl(canvas, "image/webp", 0.86);
+  const dataUrl = webp.startsWith("data:image/webp") ? webp : canvasToDataUrl(canvas, "image/jpeg", 0.86);
+  return dataUrl;
+};
+
+const handleImageUpload = async (file) => {
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (event) => {
+  try {
+    const optimized = await compressImage(file);
     const step = state.guide.steps[state.activeStep];
-    step.imageDataUrl = event.target.result;
+    step.imageDataUrl = optimized;
     step.markers = [];
     saveLocal();
     renderPreview();
-  };
-  reader.readAsDataURL(file);
+  } catch (err) {
+    console.warn("Image upload failed:", err);
+  }
 };
 
 const downloadFile = (content, filename, type) => {
