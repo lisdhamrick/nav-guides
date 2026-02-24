@@ -99,6 +99,12 @@ const getViewerUrl = (settings, path) => {
 const encodeBase64 = (value) =>
   btoa(unescape(encodeURIComponent(value)));
 
+const getGuideThumbnail = (guide) => {
+  if (guide && guide.thumbnailDataUrl) return guide.thumbnailDataUrl;
+  const firstStep = guide && guide.steps ? guide.steps[0] : null;
+  return firstStep && firstStep.imageDataUrl ? firstStep.imageDataUrl : "";
+};
+
 const fetchPublishedGuides = async () => {
   const settings = loadGithubSettings();
   if (!settings || !settings.owner || !settings.repo) {
@@ -123,12 +129,27 @@ const fetchPublishedGuides = async () => {
   const jsonFiles = entries.filter((item) => item.type === "file" && item.name.endsWith(".json"));
 
   const base = `https://${settings.owner}.github.io/${settings.repo}/`;
-  return jsonFiles.map((item) => ({
-    name: item.name,
-    path: item.path,
-    url: `${base}viewer.html?src=${item.path}`,
-    downloadUrl: item.download_url
-  }));
+  const hydrated = await Promise.all(
+    jsonFiles.map(async (item) => {
+      let data = null;
+      try {
+        const res = await fetch(item.download_url);
+        if (res.ok) data = await res.json();
+      } catch (err) {
+        data = null;
+      }
+      return {
+        name: item.name,
+        path: item.path,
+        url: `${base}viewer.html?src=${item.path}`,
+        title: data?.title || item.name.replace(/\.json$/, ""),
+        description: data?.description || "",
+        thumbnail: getGuideThumbnail(data || {})
+      };
+    })
+  );
+
+  return hydrated;
 };
 
 const renderPublished = async () => {
@@ -145,9 +166,10 @@ const renderPublished = async () => {
     const card = document.createElement("div");
     card.className = "library-card";
     card.innerHTML = `
-      <div>
-        <h3>${item.name.replace(/\\.json$/, "")}</h3>
-        <p class="lede">${item.path}</p>
+      <div class="library-card-body">
+        ${item.thumbnail ? `<img class="library-thumb" src="${item.thumbnail}" alt="Guide thumbnail" />` : ""}
+        <h3>${item.title}</h3>
+        <p class="lede">${item.description || item.path}</p>
       </div>
       <div class="library-actions">
         <a class="btn" href="${item.url}" target="_blank">Open</a>
@@ -250,9 +272,11 @@ const renderGuide = (guide, settings) => {
   const updated = guide.updatedAt
     ? new Date(guide.updatedAt).toLocaleString()
     : "";
+  const thumb = getGuideThumbnail(guide);
 
   card.innerHTML = `
-    <div>
+    <div class="library-card-body">
+      ${thumb ? `<img class="library-thumb" src="${thumb}" alt="Guide thumbnail" />` : ""}
       <h3>${title}</h3>
       <p class="lede">${description}</p>
       <p class="lede" style="font-size: 0.85rem;">Updated ${updated}</p>

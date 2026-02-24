@@ -14,7 +14,7 @@ const ensureLightbox = () => {
   box = document.createElement("div");
   box.className = "lightbox hidden";
   box.innerHTML = `
-    <button class="btn">Close</button>
+    <button class="btn lightbox-close" aria-label="Close zoomed view">✕</button>
     <img alt="Zoomed view" />
   `;
   document.body.appendChild(box);

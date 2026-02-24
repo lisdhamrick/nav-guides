@@ -10,7 +10,8 @@ const defaultGuide = () => ({
       videoUrl: "",
       audioUrl: ""
     }
-  ]
+  ],
+  thumbnailDataUrl: ""
 });
 
 const state = {
@@ -31,6 +32,7 @@ const els = {
   removeStep: document.getElementById("removeStep"),
   guideTitle: document.getElementById("guideTitle"),
   guideDescription: document.getElementById("guideDescription"),
+  guideThumbnail: document.getElementById("guideThumbnail"),
   stepTitle: document.getElementById("stepTitle"),
   stepText: document.getElementById("stepText"),
   stepImage: document.getElementById("stepImage"),
@@ -104,7 +106,8 @@ const saveGuideToLibrary = () => {
     updatedAt: state.guide.updatedAt,
     publishedUrl: state.guide.publishedUrl || "",
     publishedPath: state.guide.publishedPath || "",
-    publishedAt: state.guide.publishedAt || ""
+    publishedAt: state.guide.publishedAt || "",
+    thumbnailDataUrl: state.guide.thumbnailDataUrl || ""
   };
 
   const idx = list.findIndex((item) => item.id === entry.id);
@@ -297,11 +300,26 @@ const handleImageUpload = async (file) => {
     const step = state.guide.steps[state.activeStep];
     step.imageDataUrl = optimized;
     step.markers = [];
+    if (!state.guide.thumbnailDataUrl) {
+      state.guide.thumbnailDataUrl = optimized;
+    }
     saveGuideToLibrary();
     saveLocal();
     renderPreview();
   } catch (err) {
     console.warn("Image upload failed:", err);
+  }
+};
+
+const handleThumbnailUpload = async (file) => {
+  if (!file) return;
+  try {
+    const optimized = await compressImage(file);
+    state.guide.thumbnailDataUrl = optimized;
+    saveGuideToLibrary();
+    saveLocal();
+  } catch (err) {
+    console.warn("Thumbnail upload failed:", err);
   }
 };
 
@@ -411,6 +429,7 @@ els.stepText.oninput = updateGuide;
 els.stepVideo.oninput = updateGuide;
 els.stepAudio.oninput = updateGuide;
 els.stepImage.onchange = (event) => handleImageUpload(event.target.files[0]);
+els.guideThumbnail.onchange = (event) => handleThumbnailUpload(event.target.files[0]);
 
 (async () => {
   await loadLocal();
