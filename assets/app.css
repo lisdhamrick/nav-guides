@@ -117,14 +117,14 @@ h1 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--card);
 }
 
 .code {
   display: inline-block;
   margin-top: 12px;
   padding: 6px 10px;
-  background: #0b1224;
+  background: var(--card);
   border-radius: 8px;
   font-size: 0.9rem;
   color: var(--accent-2);
@@ -171,7 +171,7 @@ h1 {
 
 .step-item.active {
   border-color: var(--accent);
-  background: rgba(245, 158, 11, 0.12);
+  background: #ffc00012;
   color: var(--text);
 }
 
@@ -201,7 +201,7 @@ h1 {
   width: 100%;
   margin-top: 6px;
   padding: 10px;
-  background: #0b1224;
+  background: #101010;
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
@@ -214,7 +214,7 @@ h1 {
 }
 
 .preview {
-  background: #0b1224;
+  background: #101010;
   border: 1px dashed var(--border);
   border-radius: var(--radius);
   padding: 16px;
