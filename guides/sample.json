@@ -1,0 +1,30 @@
+{
+  "title": "Share a Google Doc as View Only",
+  "description": "Send a Google Doc link that anyone can view without logging in.",
+  "steps": [
+    {
+      "title": "Open the Share dialog",
+      "text": "In Google Docs, click the Share button in the top-right corner.",
+      "imageDataUrl": "",
+      "markers": [],
+      "videoUrl": "",
+      "audioUrl": ""
+    },
+    {
+      "title": "Change access to Anyone with the link",
+      "text": "Click the access dropdown and select Anyone with the link. Set the role to Viewer.",
+      "imageDataUrl": "",
+      "markers": [],
+      "videoUrl": "",
+      "audioUrl": ""
+    },
+    {
+      "title": "Copy the link",
+      "text": "Click Copy link, then paste it where you need to share it.",
+      "imageDataUrl": "",
+      "markers": [],
+      "videoUrl": "",
+      "audioUrl": ""
+    }
+  ]
+}
