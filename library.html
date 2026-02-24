@@ -20,8 +20,11 @@
         </div>
       </div>
 
-      <section class="library-panel">
-        <h2>Connect GitHub</h2>
+      <section class="library-panel" id="githubPanel">
+        <div class="library-header">
+          <h2>Connect GitHub</h2>
+          <button class="btn" id="toggleGithub">Hide</button>
+        </div>
         <p class="lede">
           Add a personal access token (PAT) with repo write access. The token is stored locally in your browser.
         </p>
@@ -52,6 +55,14 @@
           <button class="btn" id="clearGithub">Clear</button>
         </div>
         <p id="githubStatus" class="lede" style="margin-top: 8px;"></p>
+      </section>
+
+      <section class="library-panel" id="publishedPanel">
+        <div class="library-header">
+          <h2>Published guides</h2>
+          <button class="btn" id="refreshPublished">Refresh</button>
+        </div>
+        <div id="publishedList" class="library-list"></div>
       </section>
 
       <section class="library-panel">

@@ -10,11 +10,15 @@ const els = {
   ghBranch: document.getElementById("ghBranch"),
   ghFolder: document.getElementById("ghFolder"),
   ghToken: document.getElementById("ghToken"),
+  toggleGithub: document.getElementById("toggleGithub"),
   saveGithub: document.getElementById("saveGithub"),
   clearGithub: document.getElementById("clearGithub"),
   githubStatus: document.getElementById("githubStatus"),
   searchInput: document.getElementById("searchInput"),
-  guideList: document.getElementById("guideList")
+  guideList: document.getElementById("guideList"),
+  publishedList: document.getElementById("publishedList"),
+  refreshPublished: document.getElementById("refreshPublished"),
+  githubPanel: document.getElementById("githubPanel")
 };
 
 const slugify = (value) =>
@@ -62,6 +66,15 @@ const loadGithubSettings = () => {
   }
 };
 
+const setGithubPanelVisibility = (visible) => {
+  if (!els.githubPanel) return;
+  els.githubPanel.style.display = visible ? "block" : "none";
+  if (els.toggleGithub) {
+    els.toggleGithub.textContent = visible ? "Hide" : "Show";
+  }
+  localStorage.setItem("githubPanelHidden", visible ? "false" : "true");
+};
+
 const updateGithubUI = () => {
   const settings = loadGithubSettings();
   if (!settings) return;
@@ -85,6 +98,76 @@ const getViewerUrl = (settings, path) => {
 
 const encodeBase64 = (value) =>
   btoa(unescape(encodeURIComponent(value)));
+
+const fetchPublishedGuides = async () => {
+  const settings = loadGithubSettings();
+  if (!settings || !settings.owner || !settings.repo) {
+    return [];
+  }
+
+  const folder = settings.folder || "guides";
+  const apiBase = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${folder}`;
+
+  const res = await fetch(apiBase, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      ...(settings.token ? { Authorization: `token ${settings.token}` } : {})
+    }
+  });
+
+  if (!res.ok) {
+    return [];
+  }
+
+  const entries = await res.json();
+  const jsonFiles = entries.filter((item) => item.type === "file" && item.name.endsWith(".json"));
+
+  const base = `https://${settings.owner}.github.io/${settings.repo}/`;
+  return jsonFiles.map((item) => ({
+    name: item.name,
+    path: item.path,
+    url: `${base}viewer.html?src=${item.path}`,
+    downloadUrl: item.download_url
+  }));
+};
+
+const renderPublished = async () => {
+  if (!els.publishedList) return;
+  els.publishedList.innerHTML = "<p class=\"lede\">Loading published guides...</p>";
+  const items = await fetchPublishedGuides();
+  if (!items.length) {
+    els.publishedList.innerHTML = "<p class=\"lede\">No published guides found.</p>";
+    return;
+  }
+
+  els.publishedList.innerHTML = "";
+  items.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "library-card";
+    card.innerHTML = `
+      <div>
+        <h3>${item.name.replace(/\\.json$/, "")}</h3>
+        <p class="lede">${item.path}</p>
+      </div>
+      <div class="library-actions">
+        <a class="btn" href="${item.url}" target="_blank">Open</a>
+        <button class="btn" data-action="copy">Copy Link</button>
+      </div>
+      <p class="lede" data-status></p>
+    `;
+    const status = card.querySelector("[data-status]");
+    const copyBtn = card.querySelector("[data-action='copy']");
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(item.url);
+        status.textContent = "Share link copied.";
+      } catch (err) {
+        status.textContent = "Unable to copy link.";
+      }
+    };
+    els.publishedList.appendChild(card);
+  });
+};
 
 const publishGuide = async (guide, libraryItem) => {
   const settings = loadGithubSettings();
@@ -263,7 +346,9 @@ els.saveGithub.onclick = () => {
   };
   saveGithubSettings(settings);
   els.githubStatus.textContent = "GitHub settings saved.";
+  setGithubPanelVisibility(false);
   renderLibrary();
+  renderPublished();
 };
 
 els.clearGithub.onclick = () => {
@@ -275,9 +360,24 @@ els.clearGithub.onclick = () => {
   els.ghFolder.value = "";
   els.ghToken.value = "";
   renderLibrary();
+  renderPublished();
 };
 
 els.searchInput.oninput = renderLibrary;
+if (els.refreshPublished) {
+  els.refreshPublished.onclick = renderPublished;
+}
+if (els.toggleGithub) {
+  els.toggleGithub.onclick = () => {
+    const hidden = localStorage.getItem("githubPanelHidden") === "true";
+    setGithubPanelVisibility(hidden);
+  };
+}
 
 updateGithubUI();
 renderLibrary();
+renderPublished();
+
+if (localStorage.getItem("githubPanelHidden") === "true") {
+  setGithubPanelVisibility(false);
+}
