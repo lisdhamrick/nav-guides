@@ -222,6 +222,8 @@ h1 {
 
 .preview img {
   max-width: 100%;
+  height: auto;
+  display: block;
   border-radius: 12px;
 }
 
@@ -243,6 +245,15 @@ h1 {
 .image-stage {
   position: relative;
   display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.image-stage img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
 }
 
 .viewer-header {
@@ -260,6 +271,7 @@ h1 {
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 20px;
+  overflow: hidden;
 }
 
 .viewer-step h3 {
