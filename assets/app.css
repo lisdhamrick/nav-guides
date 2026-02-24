@@ -1,13 +1,13 @@
 :root {
   --bg: #000000;
-  --panel: #111c3a;
-  --accent: #f59e0b;
+  --panel: #353535;
+  --accent: #ffc000;
   --accent-2: #22c55e;
   --text: #e2e8f0;
-  --muted: #94a3b8;
-  --card: #0b1224;
-  --border: #1e293b;
-  --shadow: 0 10px 30px rgba(2, 6, 23, 0.45);
+  --muted: #b1b1b1;
+  --card: #1c1c1c;
+  --border: #292929;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   --radius: 16px;
   --radius-sm: 10px;
   --font: "Futura", "Space Grotesk", "Trebuchet MS", system-ui, sans-serif;
