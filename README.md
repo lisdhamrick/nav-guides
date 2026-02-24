@@ -48,3 +48,15 @@ Use an iframe and point to the viewer URL:
 - Images are stored as data URLs in the JSON. This keeps guides self-contained but can grow file size.
 - The viewer includes a **Print / Save PDF** button to export to PDF.
 - Video URLs support YouTube and Vimeo embeds by default. Other URLs are used directly.
+
+
+## Guide Library + GitHub Publish
+
+1. Open `library.html` to manage guides.
+2. Click **Connect GitHub** and enter your repo + token.
+3. Publish a guide with one click.
+4. Share the viewer link from the library.
+
+### Create a GitHub token
+
+Create a classic token with repo contents write access. Store it only in your browser.

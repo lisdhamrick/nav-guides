@@ -322,3 +322,70 @@ h1 {
     display: block;
   }
 }
+
+.library-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.library-grid input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  background: #101010;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.library-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.library-search {
+  min-width: 240px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #101010;
+  color: var(--text);
+}
+
+.library-list {
+  display: grid;
+  gap: 16px;
+}
+
+.library-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: #141414;
+  display: grid;
+  gap: 12px;
+}
+
+.library-card h3 {
+  margin: 0 0 6px;
+}
+
+.library-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

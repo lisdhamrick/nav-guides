@@ -5,6 +5,8 @@ const getQueryParam = (key) => {
   return params.get(key);
 };
 
+const storageKeys = { guidePrefix: "guide:" };
+
 const normalizeVideoUrl = (url) => {
   if (!url) return "";
   if (url.includes("youtube.com/watch") || url.includes("youtu.be")) {
@@ -117,6 +119,20 @@ const loadGuide = async () => {
     } catch (err) {
       renderGuide(null);
       return;
+    }
+  }
+
+  const guideId = getQueryParam("id");
+  if (guideId) {
+    const storedGuide = localStorage.getItem(`${storageKeys.guidePrefix}${guideId}`);
+    if (storedGuide) {
+      try {
+        renderGuide(JSON.parse(storedGuide));
+        return;
+      } catch (err) {
+        renderGuide(null);
+        return;
+      }
     }
   }
 

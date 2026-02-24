@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Guide Library</title>
+    <link rel="stylesheet" href="assets/app.css" />
+  </head>
+  <body>
+    <main class="viewer-shell">
+      <div class="viewer-header">
+        <div>
+          <p class="eyebrow">Guide Library</p>
+          <h1>Your guides</h1>
+          <p class="lede">Search, publish, share, and edit guides.</p>
+        </div>
+        <div class="actions">
+          <a class="btn" href="index.html">Home</a>
+          <a class="btn" href="editor.html">Create guide</a>
+        </div>
+      </div>
+
+      <section class="library-panel">
+        <h2>Connect GitHub</h2>
+        <p class="lede">
+          Add a personal access token (PAT) with repo write access. The token is stored locally in your browser.
+        </p>
+        <div class="library-grid">
+          <label>
+            GitHub username or org
+            <input id="ghOwner" placeholder="lisdhamrick" />
+          </label>
+          <label>
+            Repo name
+            <input id="ghRepo" placeholder="nav-guides" />
+          </label>
+          <label>
+            Branch
+            <input id="ghBranch" placeholder="main" />
+          </label>
+          <label>
+            Guides folder
+            <input id="ghFolder" placeholder="guides" />
+          </label>
+          <label>
+            Personal access token
+            <input id="ghToken" type="password" placeholder="ghp_..." />
+          </label>
+        </div>
+        <div class="actions" style="margin-top: 12px;">
+          <button class="btn primary" id="saveGithub">Save GitHub Settings</button>
+          <button class="btn" id="clearGithub">Clear</button>
+        </div>
+        <p id="githubStatus" class="lede" style="margin-top: 8px;"></p>
+      </section>
+
+      <section class="library-panel">
+        <div class="library-header">
+          <h2>All guides</h2>
+          <input id="searchInput" class="library-search" placeholder="Search by title or description" />
+        </div>
+        <div id="guideList" class="library-list"></div>
+      </section>
+    </main>
+
+    <script src="assets/library.js"></script>
+  </body>
+</html>

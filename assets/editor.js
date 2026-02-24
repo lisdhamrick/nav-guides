@@ -19,6 +19,12 @@ const state = {
   placingMarker: false
 };
 
+const storageKeys = {
+  draft: "guideDraft",
+  library: "guideLibrary",
+  guidePrefix: "guide:"
+};
+
 const els = {
   stepList: document.getElementById("stepList"),
   addStep: document.getElementById("addStep"),
@@ -43,7 +49,7 @@ const els = {
 
 const saveLocal = () => {
   try {
-    localStorage.setItem("guideDraft", JSON.stringify(state.guide));
+    localStorage.setItem(storageKeys.draft, JSON.stringify(state.guide));
     if (els.saveStatus) {
       els.saveStatus.textContent = "";
     }
@@ -52,17 +58,104 @@ const saveLocal = () => {
     console.warn("Autosave failed:", err);
     if (els.saveStatus) {
       els.saveStatus.textContent =
-        "Autosave is off (image too large for browser storage). Your preview is safe, but export soon.";
+        "Autosave is off (image too large for browser storage). Your preview is safe, but export or publish soon.";
     }
     return false;
   }
 };
 
-const loadLocal = () => {
-  const stored = localStorage.getItem("guideDraft");
+const loadLibraryList = () => {
+  const stored = localStorage.getItem(storageKeys.library);
+  if (!stored) return [];
+  try {
+    return JSON.parse(stored);
+  } catch (err) {
+    return [];
+  }
+};
+
+const saveLibraryList = (list) => {
+  try {
+    localStorage.setItem(storageKeys.library, JSON.stringify(list));
+  } catch (err) {
+    console.warn("Library save failed:", err);
+  }
+};
+
+const ensureGuideMetadata = () => {
+  if (!state.guide.id) {
+    state.guide.id = (window.crypto?.randomUUID && window.crypto.randomUUID()) ||
+      `guide-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+  if (!state.guide.createdAt) {
+    state.guide.createdAt = new Date().toISOString();
+  }
+  state.guide.updatedAt = new Date().toISOString();
+};
+
+const saveGuideToLibrary = () => {
+  ensureGuideMetadata();
+  const list = loadLibraryList();
+  const entry = {
+    id: state.guide.id,
+    title: state.guide.title || "Untitled Guide",
+    description: state.guide.description || "",
+    createdAt: state.guide.createdAt,
+    updatedAt: state.guide.updatedAt,
+    publishedUrl: state.guide.publishedUrl || "",
+    publishedPath: state.guide.publishedPath || "",
+    publishedAt: state.guide.publishedAt || ""
+  };
+
+  const idx = list.findIndex((item) => item.id === entry.id);
+  if (idx >= 0) {
+    list[idx] = entry;
+  } else {
+    list.unshift(entry);
+  }
+  saveLibraryList(list);
+
+  try {
+    localStorage.setItem(`${storageKeys.guidePrefix}${entry.id}`, JSON.stringify(state.guide));
+  } catch (err) {
+    console.warn("Guide storage failed:", err);
+  }
+};
+
+const loadLocal = async () => {
+  const params = new URLSearchParams(window.location.search);
+  const guideId = params.get("id");
+  const src = params.get("src");
+
+  if (guideId) {
+    const stored = localStorage.getItem(`${storageKeys.guidePrefix}${guideId}`);
+    if (stored) {
+      try {
+        state.guide = JSON.parse(stored);
+        return;
+      } catch (err) {
+        state.guide = defaultGuide();
+      }
+    }
+  }
+
+  if (src) {
+    try {
+      const res = await fetch(src);
+      if (res.ok) {
+        state.guide = await res.json();
+        return;
+      }
+    } catch (err) {
+      state.guide = defaultGuide();
+    }
+  }
+
+  const stored = localStorage.getItem(storageKeys.draft);
   if (stored) {
     try {
       state.guide = JSON.parse(stored);
+      return;
     } catch (err) {
       state.guide = defaultGuide();
     }
@@ -125,6 +218,7 @@ const renderPreview = () => {
     const label = String(step.markers.length + 1);
     step.markers.push({ x: Number(x.toFixed(2)), y: Number(y.toFixed(2)), label });
     state.placingMarker = false;
+    saveGuideToLibrary();
     saveLocal();
     renderPreview();
   };
@@ -150,6 +244,7 @@ const updateGuide = () => {
   step.text = els.stepText.value.trim();
   step.videoUrl = els.stepVideo.value.trim();
   step.audioUrl = els.stepAudio.value.trim();
+  saveGuideToLibrary();
   saveLocal();
   renderStepList();
 };
@@ -202,6 +297,7 @@ const handleImageUpload = async (file) => {
     const step = state.guide.steps[state.activeStep];
     step.imageDataUrl = optimized;
     step.markers = [];
+    saveGuideToLibrary();
     saveLocal();
     renderPreview();
   } catch (err) {
@@ -254,6 +350,7 @@ els.addStep.onclick = () => {
     audioUrl: ""
   });
   state.activeStep = state.guide.steps.length - 1;
+  saveGuideToLibrary();
   saveLocal();
   renderForm();
 };
@@ -262,6 +359,7 @@ els.removeStep.onclick = () => {
   if (state.guide.steps.length <= 1) return;
   state.guide.steps.splice(state.activeStep, 1);
   state.activeStep = Math.max(0, state.activeStep - 1);
+  saveGuideToLibrary();
   saveLocal();
   renderForm();
 };
@@ -275,6 +373,7 @@ els.clearMarkers.onclick = () => {
   const step = state.guide.steps[state.activeStep];
   if (!step) return;
   step.markers = [];
+  saveGuideToLibrary();
   saveLocal();
   renderPreview();
 };
@@ -292,6 +391,7 @@ els.jsonFile.onchange = (event) => {
       const data = JSON.parse(fileEvent.target.result);
       state.guide = data;
       state.activeStep = 0;
+      saveGuideToLibrary();
       saveLocal();
       renderForm();
     } catch (err) {
@@ -312,5 +412,8 @@ els.stepVideo.oninput = updateGuide;
 els.stepAudio.oninput = updateGuide;
 els.stepImage.onchange = (event) => handleImageUpload(event.target.files[0]);
 
-loadLocal();
-renderForm();
+(async () => {
+  await loadLocal();
+  saveGuideToLibrary();
+  renderForm();
+})();
